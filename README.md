@@ -3,7 +3,7 @@
 Inflation Planner is a simple web application that helps you plan for inflation. It allows you to calculate the future
 value of an investment based on the current value, interest rate, and number of years.
 
-Developed using React, TypeScript, Chakra UI, Nivo & Vite
+Developed using React, TypeScript, [Chakra UI](https://v2.chakra-ui.com/), [Nivo](https://nivo.rocks/) & Vite.
 
 ## Features
 
@@ -19,3 +19,8 @@ Developed using React, TypeScript, Chakra UI, Nivo & Vite
     - shows any shortfall in a different color
 - Allows the user to automatically correct a shortfall and conditionally keep the adjusted parameter value
 
+TODO:
+
+- add more inflation statistics
+- add parameters to URL for sharing
+- make parameters sticky using local storage
