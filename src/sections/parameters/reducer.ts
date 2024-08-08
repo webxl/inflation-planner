@@ -1,4 +1,4 @@
-import { SavingsFormData } from '../savings.ts';
+import { SavingsFormData } from '../../savings.ts';
 import dayjs from 'dayjs';
 
 type reducerState = SavingsFormData & { isDirty?: boolean; overrides: { [key: string]: boolean } };

@@ -30,10 +30,10 @@ function BreakdownPieChart(props: {
   const { colorMode } = useColorMode();
 
   return (
-    <Box height={{ xl: 300, lg: 200 }} width={{ xl: 450, lg: 350 }}>
+    <Box height={{ base: 200, xl: 300, lg: 200 }} width={{ base: 400, xl: 450, lg: 350 }}>
       <ResponsivePie
         data={props.data}
-        margin={{ top: 20, right: 80, bottom: 80, left: 80 }}
+        margin={{ top: 30, right: 80, bottom: 30, left: 80 }}
         sortByValue={true}
         activeOuterRadiusOffset={8}
         borderWidth={1}
@@ -58,6 +58,8 @@ function BreakdownPieChart(props: {
         }}
         arcLinkLabelsSkipAngle={10}
         arcLinkLabelsTextColor={colorMode === 'dark' ? '#AAA' : '#333'}
+        arcLinkLabelsDiagonalLength={10}
+        arcLinkLabelsStraightLength={10}
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{
           from: 'color',
@@ -146,9 +148,10 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
         color: serieDefs[d.id]?.color
       };
     });
+
   return (
     <HStack flexWrap={'wrap'} w={'100%'} gap={0} justifyContent={'space-between'}>
-      <VStack w={'50%'} minW={400} p={0}>
+      <VStack w={{ base: '100%', lg: '50%' }} minW={400} p={0}>
         <Table width={'100%'} as={'div'}>
           <Thead as={'div'}>
             <Th as={'div'} borderBottom={0}>
@@ -158,7 +161,7 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
         </Table>
         <BreakdownPieChart data={gains} />
       </VStack>
-      <VStack w={'50%'} p={0} minW={{ xl: 460 }}>
+      <VStack w={{ base: '100%', lg: '50%' }} p={0} minW={{ xl: 460 }} minH={200}>
         <Table width={'100%'} as={'div'}>
           <Th as={'div'} borderBottom={0} paddingInline={6} py={3}>
             Total Consumption

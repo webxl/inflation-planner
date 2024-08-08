@@ -1,7 +1,7 @@
-import { Checkbox, VStack } from '@chakra-ui/react';
+import { Button, Checkbox, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
 import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { SavingsFormData, ShortfallAdjustmentType } from '../savings.ts';
+import { SavingsFormData, ShortfallAdjustmentType } from '../../savings.ts';
 import { DateInput, DollarAmountInput, PercentageAmountInput } from './inputs.tsx';
 import parametersReducer from './reducer.ts';
 
@@ -11,7 +11,8 @@ const Parameters = ({
   shortfallAdjustmentValue,
   preserveAdjustment,
   handleKeepReset,
-  parameters
+  parameters,
+  onDrawerClose
 }: {
   onChange: (params: SavingsFormData) => void;
   shortfallAdjustmentType?: ShortfallAdjustmentType;
@@ -19,6 +20,7 @@ const Parameters = ({
   preserveAdjustment?: boolean;
   handleKeepReset: (isKeeping: boolean) => void;
   parameters: SavingsFormData;
+  onDrawerClose?: (() => void) | undefined;
 }) => {
   const [state, dispatch] = useReducer(parametersReducer, { ...parameters, overrides: {} });
 
@@ -170,7 +172,7 @@ const Parameters = ({
   }, []);
 
   return (
-    <VStack alignItems={'flex-start'} minW={180} /* key={calcID}*/>
+    <VStack alignItems={'flex-start'} minW={180}>
       <DollarAmountInput
         label={'Initial Savings Balance'}
         onChange={handleInitialSavingsAmountChange}
@@ -278,6 +280,11 @@ const Parameters = ({
         useOverride={state.overrides.expectedRateOfReturn}
         handleKeepReset={handleKeepReset}
       />
+      {onDrawerClose && (
+        <Button onClick={onDrawerClose} aria-label={'Apply'} alignSelf={'center'}>
+          Apply
+        </Button>
+      )}
     </VStack>
   );
 };
