@@ -1,8 +1,8 @@
-import { Button, Checkbox, VStack } from '@chakra-ui/react';
+import { Button, VStack } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { SavingsFormData, ShortfallAdjustmentType } from '../../savings.ts';
-import { DateInput, DollarAmountInput, PercentageAmountInput } from './inputs.tsx';
+import { CheckboxInput, DateInput, DollarAmountInput, PercentageAmountInput } from './inputs.tsx';
 import parametersReducer from './reducer.ts';
 
 const Parameters = ({
@@ -12,7 +12,8 @@ const Parameters = ({
   preserveAdjustment,
   handleKeepReset,
   parameters,
-  onDrawerClose
+  onDrawerClose,
+  resetToDefaults
 }: {
   onChange: (params: SavingsFormData) => void;
   shortfallAdjustmentType?: ShortfallAdjustmentType;
@@ -21,6 +22,7 @@ const Parameters = ({
   handleKeepReset: (isKeeping: boolean) => void;
   parameters: SavingsFormData;
   onDrawerClose?: (() => void) | undefined;
+  resetToDefaults: () => void;
 }) => {
   const [state, dispatch] = useReducer(parametersReducer, { ...parameters, overrides: {} });
 
@@ -62,23 +64,17 @@ const Parameters = ({
     dispatch({ type: 'withdrawalEnd', value: endDate, isDirty: true });
   }, []);
 
-  const handleIncreaseContributionWithInflationCheck = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch({
-        type: 'increaseContributionWithInflation',
-        value: e.target.checked,
-        isDirty: true
-      });
-    },
-    []
-  );
+  const handleIncreaseContributionWithInflationCheck = useCallback((checked: boolean) => {
+    dispatch({
+      type: 'increaseContributionWithInflation',
+      value: checked,
+      isDirty: true
+    });
+  }, []);
 
-  const handleIncreaseWithdrawalWithInflationCheck = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      dispatch({ type: 'increaseWithdrawalWithInflation', value: e.target.checked, isDirty: true });
-    },
-    []
-  );
+  const handleIncreaseWithdrawalWithInflationCheck = useCallback((checked: boolean) => {
+    dispatch({ type: 'increaseWithdrawalWithInflation', value: checked, isDirty: true });
+  }, []);
 
   const [currentAdjustmentType, setCurrentAdjustmentType] = useState<
     ShortfallAdjustmentType | undefined
@@ -121,7 +117,7 @@ const Parameters = ({
     ) {
       dispatch({ type: currentAdjustmentType, value: adjustmentRestoreValue, setOverride: true });
       setAdjustmentRestoreValue(undefined);
-      useOverrideTimeoutRef.current = setTimeout(resetOverrides, 1500);
+      useOverrideTimeoutRef.current = setTimeout(resetOverrides, 500);
     }
 
     if (preserveAdjustment && !shortfallAdjustmentType && adjustmentRestoreValue !== undefined) {
@@ -146,11 +142,11 @@ const Parameters = ({
         dayjs(parameters.withdrawalStart).format('L') !== dayjs(state.withdrawalStart).format('L')
       ) {
         dispatch({ type: 'withdrawalStart', value: parameters.withdrawalStart, setOverride: true });
-        useOverrideTimeoutRef.current = setTimeout(resetOverrides, 1500);
+        useOverrideTimeoutRef.current = setTimeout(resetOverrides, 500);
       }
       if (dayjs(parameters.withdrawalEnd).format('L') !== dayjs(state.withdrawalEnd).format('L')) {
         dispatch({ type: 'withdrawalEnd', value: parameters.withdrawalEnd, setOverride: true });
-        useOverrideTimeoutRef.current = setTimeout(resetOverrides, 1500);
+        useOverrideTimeoutRef.current = setTimeout(resetOverrides, 500);
       }
     }
   }, [
@@ -170,6 +166,18 @@ const Parameters = ({
       }
     };
   }, []);
+
+  const _resetToDefaults = useCallback(() => {
+    resetToDefaults();
+    dispatch({ type: 'overrideAll' });
+    useOverrideTimeoutRef.current = setTimeout(resetOverrides, 500);
+  }, [resetToDefaults]);
+
+  useEffect(() => {
+    if (state.overrideAll) {
+      dispatch({ type: 'setParameters', value: parameters });
+    }
+  }, [parameters, state.overrideAll]);
 
   return (
     <VStack alignItems={'flex-start'} minW={180}>
@@ -204,15 +212,14 @@ const Parameters = ({
         }
         handleKeepReset={handleKeepReset}
       />
-      <Checkbox
-        checked={state.increaseContributionWithInflation}
+      <CheckboxInput
+        isChecked={state.increaseContributionWithInflation}
         onChange={handleIncreaseContributionWithInflationCheck}
+        useOverride={state.overrides.increaseContributionWithInflation}
         isDisabled={!!shortfallAdjustmentType}
-        variant={'contrastBg'}
-        colorScheme={'green'}
-      >
-        Increase with inflation
-      </Checkbox>
+        label={'Increase with inflation'}
+      />
+
       <DateInput
         label={'Withdrawal Start'}
         value={state.withdrawalStart}
@@ -239,15 +246,13 @@ const Parameters = ({
         useOverride={state.overrides.withdrawalMonthlyAmount}
         handleKeepReset={handleKeepReset}
       />
-      <Checkbox
-        checked={state.increaseWithdrawalWithInflation}
+      <CheckboxInput
+        isChecked={state.increaseWithdrawalWithInflation}
         onChange={handleIncreaseWithdrawalWithInflationCheck}
         isDisabled={!!shortfallAdjustmentType}
-        variant={'contrastBg'}
-        colorScheme={'green'}
-      >
-        Increase with inflation
-      </Checkbox>
+        useOverride={state.overrides.increaseWithdrawalWithInflation}
+        label={'Increase with inflation'}
+      />
       <DateInput
         label={'Withdrawal End Date'}
         value={state.withdrawalEnd}
@@ -265,6 +270,7 @@ const Parameters = ({
           'The average annual rate of inflation you expect going forward. Note: the average rate of inflation in the US since 1913 is 3.22% and since 1990 is 2.61%.'
         }
         isDisabled={!!shortfallAdjustmentType}
+        useOverride={state.overrides.projectedInflationRate}
         handleKeepReset={handleKeepReset}
       />
       <PercentageAmountInput
@@ -285,6 +291,9 @@ const Parameters = ({
           Apply
         </Button>
       )}
+      <Button variant={'link'} onClick={_resetToDefaults} alignSelf={'center'}>
+        Reset to defaults
+      </Button>
     </VStack>
   );
 };

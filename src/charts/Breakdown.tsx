@@ -12,11 +12,11 @@ const serieDefs: {
     label: string;
   };
 } = {
-  initial: { color: 'hsl(54,84%,65%)', label: 'Initial Savings' },
-  contributions: { color: 'hsl(9,87%,67%)', label: 'Total Contributions' },
-  return: { color: 'hsl(170,52%,59%)', label: 'Total Return' },
-  inflation: { color: 'rgb(232, 168, 56)', label: 'Total Inflation' },
-  withdrawal: { color: 'rgb(151,204,227)', label: 'Total Withdrawal' }
+  initial: { color: 'hsl(54,84%,65%)', label: 'Initial' },
+  contributions: { color: 'hsl(9,87%,67%)', label: 'Contributions' },
+  return: { color: 'hsl(170,52%,59%)', label: 'Returns' },
+  inflation: { color: 'rgb(232, 168, 56)', label: 'Inflation' },
+  withdrawal: { color: 'rgb(151,204,227)', label: 'Withdrawal' }
 };
 
 function BreakdownPieChart(props: {
@@ -58,9 +58,7 @@ function BreakdownPieChart(props: {
         }}
         arcLinkLabelsSkipAngle={10}
         arcLinkLabelsTextColor={colorMode === 'dark' ? '#AAA' : '#333'}
-        arcLinkLabelsDiagonalLength={10}
-        arcLinkLabelsStraightLength={10}
-        arcLinkLabelsThickness={2}
+        arcLinkLabelsThickness={1}
         arcLinkLabelsColor={{
           from: 'color',
           modifiers: [['darker', 2]]
@@ -91,31 +89,6 @@ function BreakdownPieChart(props: {
             id: 'lines'
           }
         ]}
-        /*legends={[
-                              {
-                                anchor: 'bottom',
-                                direction: 'column',
-                                justify: false,
-                                translateX: 0,
-                                translateY: 56,
-                                itemsSpacing: 0,
-                                itemWidth: 100,
-                                itemHeight: 18,
-                                itemTextColor: '#999',
-                                itemDirection: 'left-to-right',
-                                itemOpacity: 1,
-                                symbolSize: 18,
-                                symbolShape: 'circle',
-                                effects: [
-                                  {
-                                    on: 'hover',
-                                    style: {
-                                      itemTextColor: '#000'
-                                    }
-                                  }
-                                ]
-                              }
-                            ]}*/
       />
     </Box>
   );

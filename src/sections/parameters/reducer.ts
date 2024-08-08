@@ -1,12 +1,16 @@
 import { SavingsFormData } from '../../savings.ts';
 import dayjs from 'dayjs';
 
-type reducerState = SavingsFormData & { isDirty?: boolean; overrides: { [key: string]: boolean } };
+type reducerState = SavingsFormData & {
+  isDirty?: boolean;
+  overrides: { [key: string]: boolean };
+  overrideAll?: boolean;
+};
 const parametersReducer = (
   state: reducerState,
   action: {
     type: string;
-    value?: string | number | Date | dayjs.Dayjs | null | boolean;
+    value?: string | number | Date | dayjs.Dayjs | null | boolean | SavingsFormData;
     isDirty?: boolean;
     setOverride?: boolean;
   }
@@ -66,9 +70,32 @@ const parametersReducer = (
     case 'increaseWithdrawalWithInflation':
       return { ...wrapState(state), increaseWithdrawalWithInflation: action.value as boolean };
     case 'isDirty':
-      return { ...state, isDirty: false };
+      return { ...state, isDirty: action.value as boolean };
     case 'resetOverrides':
-      return { ...state, overrides: {} };
+      return { ...state, overrides: {}, overrideAll: false };
+    case 'overrideAll':
+      return {
+        ...state,
+        overrideAll: true,
+        overrides: {
+          initialSavingsAmount: true,
+          contributionStart: true,
+          withdrawalStart: true,
+          withdrawalEnd: true,
+          monthlyContributionAmount: true,
+          withdrawalMonthlyAmount: true,
+          projectedInflationRate: true,
+          expectedRateOfReturn: true,
+          expectedInflationRate: true,
+          increaseContributionWithInflation: true,
+          increaseWithdrawalWithInflation: true
+        }
+      };
+    case 'setParameters':
+      return {
+        ...state,
+        ...(action.value as reducerState)
+      };
     default:
       break;
   }

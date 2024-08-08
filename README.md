@@ -23,4 +23,5 @@ TODO:
 
 - add more inflation statistics
 - add parameters to URL for sharing
-- make parameters sticky using local storage
+- ~~make parameters sticky using local storage~~
+- add monte carlo simulation

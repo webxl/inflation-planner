@@ -25,7 +25,8 @@ const variantContrastBg = definePartsStyle(props => {
 
   return {
     control: defineStyle({
-      backgroundColor: colorMode === 'dark' ? 'gray.900' : 'white'
+      backgroundColor: colorMode === 'dark' ? 'gray.900' : 'white',
+      borderWidth: 1
     })
   };
 });
@@ -275,11 +276,6 @@ const config = {
     Checkbox: checkboxTheme,
     Alert: alertTheme
   }
-  /*  styles: {
-        global: {
-          'input::-webkit-calendar-picker-indicator': { marginRight: '-7px' }
-        }
-      }*/
 };
 
 const theme = extendTheme(config);

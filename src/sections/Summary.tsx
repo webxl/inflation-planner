@@ -87,6 +87,14 @@ export const Summary = ({
     breakdownData.find(b => b.id === breakdownType.contributions)?.value as number
   );
 
+    const totalWithdrawals = formatCurrency(
+      breakdownData.find(b => b.id === breakdownType.withdrawal)?.value as number
+    );
+
+    const totalReturn = formatCurrency(
+      breakdownData.find(b => b.id === breakdownType.return)?.value as number
+    );
+
   const totalInflation = formatCurrency(
     breakdownData.find(b => b.id === breakdownType.inflation)?.value as number
   );
@@ -124,12 +132,24 @@ export const Summary = ({
       <Td>{totalContributions}</Td>
     </>
   );
-  const WithdrawalEnd = (
-    <>
-      <Th>Withdrawal End</Th>
-      <Td>{formatCurrency(savingsBalanceData[savingsBalanceData.length - 1]?.y)}</Td>
-    </>
-  );
+    const Withdrawals = (
+      <>
+        <Th>Total Withdrawals</Th>
+        <Td>{totalWithdrawals}</Td>
+      </>
+    );
+    const Return = (
+      <>
+        <Th>Returns</Th>
+        <Td>{totalReturn}</Td>
+      </>
+    );
+    const WithdrawalEnd = (
+      <>
+        <Th>Withdrawal End</Th>
+        <Td>{formatCurrency(savingsBalanceData[savingsBalanceData.length - 1]?.y)}</Td>
+      </>
+    );
   const TotalInflation = (
     <>
       <Th>Inflation</Th>
@@ -141,7 +161,7 @@ export const Summary = ({
   );
   const BalanceExhausted = (
     <>
-      <Th color={shortfallAdjustmentType ? '#888' : 'inherit'}>Balance exhausted</Th>
+      <Th>Balance exhausted</Th>
       <Td color={shortfallAdjustmentType ? '#888' : '#b0413e'}>{exhaustedDate}</Td>
     </>
   );
@@ -201,8 +221,10 @@ export const Summary = ({
           {breakpoint === 'base' ? (
             <>
               <Tr>{WithdrawalStart}</Tr>
+              <Tr>{Withdrawals}</Tr>
               <Tr>{WithdrawalEnd}</Tr>
               <Tr>{Contributions}</Tr>
+              <Tr>{Return}</Tr>
               <Tr>{TotalInflation}</Tr>
               {(exd || exhaustedDate || shortfallAdjustmentType) && (
                 <>
@@ -216,6 +238,10 @@ export const Summary = ({
               <Tr>
                 {WithdrawalStart}
                 {Contributions}
+              </Tr>
+              <Tr>
+                {Withdrawals}
+                {Return}
               </Tr>
               <Tr>
                 {WithdrawalEnd}

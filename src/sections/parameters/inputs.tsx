@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatCurrency, formatCurrencyWithCents, formatPercentage } from '../../utils.ts';
 import {
   Box,
+  Checkbox,
   FormControl,
   FormLabel,
   HStack,
@@ -246,6 +247,8 @@ const _Input = ({
     </div>
   ) : null;
 
+  const _useOverride = useOverride && value !== externallySetValue;
+
   return (
     <FormControl>
       <Label label={label} tooltip={tooltip} isDisabled={isDisabled && !highlight} />
@@ -261,7 +264,7 @@ const _Input = ({
             step={step}
             isDisabled={isDisabled && !highlight}
             isReadOnly={highlight}
-            borderColor={highlight ? 'green' : useOverride ? 'orange' : 'inherit'}
+            borderColor={highlight ? 'green' : _useOverride ? 'orange' : 'inherit'}
             backgroundColor={colorMode.colorMode === 'dark' ? 'gray.800' : 'white'}
             title={numberFormatter?.(value as number)}
             w={'100%'}
@@ -302,7 +305,7 @@ const _Input = ({
               isDisabled={isDisabled && !highlight}
               isReadOnly={highlight}
               backgroundColor={colorMode.colorMode === 'dark' ? 'gray.800' : 'white'}
-              borderColor={highlight ? 'green' : useOverride ? 'orange' : 'inherit'}
+              borderColor={highlight ? 'green' : _useOverride ? 'orange' : 'inherit'}
               transitionProperty={'border-color'}
               transitionDuration={'1s'}
               fontWeight={highlight ? '700' : 'normal'}
@@ -319,6 +322,46 @@ const _Input = ({
         )}
       </InputGroup>
     </FormControl>
+  );
+};
+
+export const CheckboxInput = ({
+  isChecked = false,
+  onChange,
+  isDisabled,
+  useOverride,
+  label
+}: {
+  isChecked?: boolean;
+  onChange?: (isChecked: boolean) => void;
+  isDisabled?: boolean;
+  useOverride?: boolean;
+  label: string;
+}) => {
+  const [checked, setChecked] = useState(isChecked);
+  const _onChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setChecked(e.target.checked);
+      onChange?.(e.target.checked);
+    },
+    [onChange]
+  );
+  useEffect(() => {
+    if (!useOverride) setChecked(isChecked);
+  }, [isChecked, useOverride]);
+  return (
+    <Checkbox
+      isChecked={isChecked}
+      onChange={_onChange}
+      borderColor={useOverride && isChecked !== checked ? 'orange' : 'inherit'}
+      transitionProperty={'border-color'}
+      transitionDuration={'1s'}
+      isDisabled={isDisabled}
+      variant={'contrastBg'}
+      colorScheme={'teal'}
+    >
+      {label}
+    </Checkbox>
   );
 };
 
