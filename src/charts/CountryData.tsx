@@ -1,35 +1,16 @@
 import { ResponsiveBar } from '@nivo/bar';
 import { VStack } from '@chakra-ui/react';
 import React from 'react';
-import {
-  BarChart,
-  Bar,
-  Rectangle,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
-import { ResponsiveLine } from '@nivo/line';
+import { ResponsiveLine, Serie } from '@nivo/line';
+import { nivoThemes } from '../theme.ts';
+import { useColorMode } from '@chakra-ui/system';
 
 export const yearMin = 2009;
 export const yearMax = 2022;
 
 type CountryData = {
+  country: string;
   [year: string]: string | number;
-};
-
-// @ts-expect-error library issue
-const CustomizedAxisTick = ({ x, y, payload }) => {
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
-        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-        {payload.value}
-      </text>
-    </g>
-  );
 };
 
 const CountryData = ({
@@ -62,28 +43,14 @@ const CountryData = ({
       }));
   }, [country, data, yearKeys]);
 
-  const rechartData = React.useMemo(() => {
-    if (country === 'ALL')
-      return data.map(d => ({
-        name: d.country,
-        inflation: d[year.toString()] as number
-      }));
-
-    const singleCountry = data.find(d => d.country === country) ?? {};
-    const singleCountryData = yearKeys.map(y => ({
-      name: y,
-      inflation: singleCountry[y.toString()] as number
-    }));
-    return singleCountryData;
-  }, [country, data, year, yearKeys]);
-
-  console.log('nivoData', nivoData);
+  const colorMode = useColorMode().colorMode;
   return (
     <VStack w={'100%'}>
-      <div style={{ height: 400, width: '100%', background: 'white' }}>
+      <div style={{ height: 400, width: '100%' }}>
         {country === 'ALL' ? (
           <ResponsiveBar
-            data={nivoData}
+            data={nivoData as CountryData[]}
+            theme={nivoThemes[colorMode]}
             keys={yearKeys}
             indexBy="country"
             margin={{ top: 10, right: 20, bottom: 80, left: 20 }}
@@ -151,8 +118,9 @@ const CountryData = ({
           />
         ) : (
           <ResponsiveLine
-            data={nivoData}
+            data={nivoData as Serie[]}
             colors={{ scheme: 'category10' }}
+            theme={nivoThemes[colorMode]}
             xScale={{
               type: 'linear',
               min: 'auto',
@@ -185,35 +153,6 @@ const CountryData = ({
             yFormat=" >-.2f"
           />
         )}
-      </div>
-      <div style={{ height: 500, width: '100%', background: 'white' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            width={500}
-            height={300}
-            data={rechartData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 50
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={'name'} tick={CustomizedAxisTick} />
-            <YAxis />
-            <Tooltip />
-            {/*<Legend rotate={45} />*/}
-            {/*{rechartKeys.map((key) => (*/}
-            <Bar
-              dataKey={'inflation'}
-              key={'name'}
-              fill="#8884d8"
-              activeBar={<Rectangle fill="pink" stroke="blue" />}
-            />
-            {/*))}*/}
-          </BarChart>
-        </ResponsiveContainer>
       </div>
     </VStack>
   );

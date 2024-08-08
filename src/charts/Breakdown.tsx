@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils.ts';
 import { BasicTooltip } from '@nivo/tooltip';
 import { nivoThemes } from '../theme.ts';
 import { useColorMode } from '@chakra-ui/system';
-import { HStack } from '@chakra-ui/react';
+import { Box, HStack, Table, Th, Thead, VStack } from '@chakra-ui/react';
 
 const serieDefs: {
   [id in breakdownType]: {
@@ -30,7 +30,7 @@ function BreakdownPieChart(props: {
   const { colorMode } = useColorMode();
 
   return (
-    <div style={{ height: 300, width: 480 }}>
+    <Box height={{ xl: 300, lg: 200 }} width={{ xl: 450, lg: 350 }}>
       <ResponsivePie
         data={props.data}
         margin={{ top: 20, right: 80, bottom: 80, left: 80 }}
@@ -115,7 +115,7 @@ function BreakdownPieChart(props: {
                               }
                             ]}*/
       />
-    </div>
+    </Box>
   );
 }
 
@@ -147,9 +147,25 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
       };
     });
   return (
-    <HStack justifyContent={'space-evenly'}>
-      <BreakdownPieChart data={gains} />
-      <BreakdownPieChart data={losses} />
+    <HStack flexWrap={'wrap'} w={'100%'} gap={0} justifyContent={'space-between'}>
+      <VStack w={'50%'} minW={400} p={0}>
+        <Table width={'100%'} as={'div'}>
+          <Thead as={'div'}>
+            <Th as={'div'} borderBottom={0}>
+              Total Savings
+            </Th>
+          </Thead>
+        </Table>
+        <BreakdownPieChart data={gains} />
+      </VStack>
+      <VStack w={'50%'} p={0} minW={{ xl: 460 }}>
+        <Table width={'100%'} as={'div'}>
+          <Th as={'div'} borderBottom={0} paddingInline={6} py={3}>
+            Total Consumption
+          </Th>
+        </Table>
+        <BreakdownPieChart data={losses} />
+      </VStack>
     </HStack>
   );
 };

@@ -2,8 +2,7 @@
 
 // import React from "react";
 
-import { Input, Select } from '@chakra-ui/react';
-import { Label } from 'recharts';
+import { Input, Select, FormLabel } from '@chakra-ui/react';
 
 const TradPortfolio = () => {
   return (
@@ -14,9 +13,9 @@ const TradPortfolio = () => {
         <option value="70/30">70/30</option>
         <option value="custom">Custom</option>
       </Select>
-      <Label>Start Date</Label>
+      <FormLabel>Start Date</FormLabel>
       <Input type="date" />
-      <Label>Principle</Label>
+      <FormLabel>Principle</FormLabel>
       <Input type="number" placeholder="Principle" />
     </div>
   );

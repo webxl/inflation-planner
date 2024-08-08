@@ -4,18 +4,20 @@ import '@fontsource-variable/nunito';
 import '@fontsource-variable/roboto-slab';
 import { checkboxAnatomy as parts } from '@chakra-ui/anatomy';
 import { createMultiStyleConfigHelpers, defineStyle } from '@chakra-ui/styled-system';
+import { theme as chakraTheme } from '@chakra-ui/theme';
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
 const { definePartsStyle, defineMultiStyleConfig } = createMultiStyleConfigHelpers(parts.keys);
 
-// default base style from the Checkbox theme
-const baseStyle = definePartsStyle({
-  /*label: {
-        fontFamily: 'mono'
-      },
-      control: {
-        padding: 1
-      }*/
+const baseStyle = definePartsStyle({});
+
+const transparentAlertVariant = definePartsStyle(props => {
+  return {
+    container: {
+      ...(chakraTheme.components.Alert.variants?.subtle?.(props)?.container || {}),
+      bg: 'transparent'
+    }
+  };
 });
 
 const variantContrastBg = definePartsStyle(props => {
@@ -48,6 +50,13 @@ export const checkboxTheme = defineMultiStyleConfig({
   baseStyle,
   variants,
   sizes
+});
+
+export const alertTheme = defineMultiStyleConfig({
+  baseStyle,
+  variants: {
+    transparent: transparentAlertVariant
+  }
 });
 
 const lightTheme: DefaultTheme = {
@@ -263,7 +272,8 @@ const config = {
     body: `'Nunito Variable', sans-serif`
   },
   components: {
-    Checkbox: checkboxTheme
+    Checkbox: checkboxTheme,
+    Alert: alertTheme
   }
   /*  styles: {
         global: {

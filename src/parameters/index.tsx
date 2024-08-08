@@ -10,12 +10,14 @@ const Parameters = ({
   shortfallAdjustmentType,
   shortfallAdjustmentValue,
   preserveAdjustment,
+  handleKeepReset,
   parameters
 }: {
   onChange: (params: SavingsFormData) => void;
   shortfallAdjustmentType?: ShortfallAdjustmentType;
   shortfallAdjustmentValue: string | number;
   preserveAdjustment?: boolean;
+  handleKeepReset: (isKeeping: boolean) => void;
   parameters: SavingsFormData;
 }) => {
   const [state, dispatch] = useReducer(parametersReducer, { ...parameters, overrides: {} });
@@ -26,35 +28,35 @@ const Parameters = ({
     dispatch({ type: 'resetOverrides' });
   };
 
-  const handleInitialSavingsAmountChange = useCallback((value: number) => {
+  const handleInitialSavingsAmountChange = useCallback((value: string | number) => {
     dispatch({ type: 'initialSavingsAmount', value: value, isDirty: true });
   }, []);
 
-  const handleMonthlyContributionAmountChange = useCallback((value: number) => {
+  const handleMonthlyContributionAmountChange = useCallback((value: string | number) => {
     dispatch({ type: 'monthlyContributionAmount', value: value, isDirty: true });
   }, []);
 
-  const handleWithdrawalMonthlyAmountChange = useCallback((value: number) => {
+  const handleWithdrawalMonthlyAmountChange = useCallback((value: string | number) => {
     dispatch({ type: 'withdrawalMonthlyAmount', value: value, isDirty: true });
   }, []);
 
-  const handleProjectedInflationRateChange = useCallback((value: number) => {
+  const handleProjectedInflationRateChange = useCallback((value: string | number) => {
     dispatch({ type: 'projectedInflationRate', value: value, isDirty: true });
   }, []);
 
-  const handleExpectedRateOfReturnChange = useCallback((value: number) => {
+  const handleExpectedRateOfReturnChange = useCallback((value: string | number) => {
     dispatch({ type: 'expectedRateOfReturn', value: value, isDirty: true });
   }, []);
 
-  const handleContributionStartChange = useCallback((startDate: string) => {
+  const handleContributionStartChange = useCallback((startDate: string | number) => {
     dispatch({ type: 'contributionStart', value: startDate, isDirty: true });
   }, []);
 
-  const handleWithdrawalStartChange = useCallback((startDate: string) => {
+  const handleWithdrawalStartChange = useCallback((startDate: string | number) => {
     dispatch({ type: 'withdrawalStart', value: startDate, isDirty: true });
   }, []);
 
-  const handleWithdrawalEndChange = useCallback((endDate: string) => {
+  const handleWithdrawalEndChange = useCallback((endDate: string | number) => {
     dispatch({ type: 'withdrawalEnd', value: endDate, isDirty: true });
   }, []);
 
@@ -137,7 +139,7 @@ const Parameters = ({
   ]);
 
   useEffect(() => {
-    if (!currentAdjustmentType && !preserveAdjustment && !isDirty) {
+    if (!currentAdjustmentType && !preserveAdjustment && !state.isDirty) {
       if (
         dayjs(parameters.withdrawalStart).format('L') !== dayjs(state.withdrawalStart).format('L')
       ) {
@@ -177,12 +179,14 @@ const Parameters = ({
         isDisabled={!!shortfallAdjustmentType}
         highlight={currentAdjustmentType === 'initialSavingsAmount'}
         useOverride={state.overrides.initialSavingsAmount}
+        handleKeepReset={handleKeepReset}
       />
       <DateInput
         label={'Contribution Start'}
         value={state.contributionStart}
         onChange={handleContributionStartChange}
         isDisabled={!!shortfallAdjustmentType}
+        handleKeepReset={handleKeepReset}
       />
       <DollarAmountInput
         label={'Monthly Contribution'}
@@ -196,6 +200,7 @@ const Parameters = ({
           'The amount you plan to contribute each month until retirement. In order to offset the effects of inflation' +
           'prior to retirement, check the "Increase with inflation" box below '
         }
+        handleKeepReset={handleKeepReset}
       />
       <Checkbox
         checked={state.increaseContributionWithInflation}
@@ -216,6 +221,7 @@ const Parameters = ({
         isDisabled={!!shortfallAdjustmentType}
         highlight={currentAdjustmentType === 'withdrawalStart'}
         useOverride={state.overrides.withdrawalStart}
+        handleKeepReset={handleKeepReset}
       />
       <DollarAmountInput
         label={'Monthly Withdrawal'}
@@ -229,6 +235,7 @@ const Parameters = ({
         isDisabled={!!shortfallAdjustmentType}
         highlight={currentAdjustmentType === 'withdrawalMonthlyAmount'}
         useOverride={state.overrides.withdrawalMonthlyAmount}
+        handleKeepReset={handleKeepReset}
       />
       <Checkbox
         checked={state.increaseWithdrawalWithInflation}
@@ -245,6 +252,7 @@ const Parameters = ({
         onChange={handleWithdrawalEndChange}
         isDisabled={!!shortfallAdjustmentType}
         useOverride={state.overrides.withdrawalEnd}
+        handleKeepReset={handleKeepReset}
       />
 
       <PercentageAmountInput
@@ -255,6 +263,7 @@ const Parameters = ({
           'The average annual rate of inflation you expect going forward. Note: the average rate of inflation in the US since 1913 is 3.22% and since 1990 is 2.61%.'
         }
         isDisabled={!!shortfallAdjustmentType}
+        handleKeepReset={handleKeepReset}
       />
       <PercentageAmountInput
         label={'Expected Rate of Return'}
@@ -267,6 +276,7 @@ const Parameters = ({
         isDisabled={!!shortfallAdjustmentType}
         highlight={currentAdjustmentType === 'expectedRateOfReturn'}
         useOverride={state.overrides.expectedRateOfReturn}
+        handleKeepReset={handleKeepReset}
       />
     </VStack>
   );

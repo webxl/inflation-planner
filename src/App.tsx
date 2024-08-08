@@ -19,9 +19,11 @@ import {
   PopoverArrow,
   Text,
   VStack,
-  Portal
+  Portal,
+  CloseButton,
+  Link
 } from '@chakra-ui/react';
-import { MoonIcon, QuestionIcon, SunIcon } from '@chakra-ui/icons';
+import { Icon, MoonIcon, QuestionIcon, SunIcon } from '@chakra-ui/icons';
 import calculateSavingsBalance, {
   BreakdownData,
   calculateShortfallAdjustment,
@@ -37,7 +39,7 @@ import { formatCurrencyWithCents, formatPercentage } from './utils.ts';
 import { WelcomeModal } from './WelcomeModal.tsx';
 import { InflationData } from './InflationData.tsx';
 import { appName } from './const.ts';
-import { AlertTriangle } from 'react-feather';
+import { AlertTriangle, GitHub } from 'react-feather';
 
 dayjs.extend(LocalizedFormat);
 
@@ -115,9 +117,17 @@ function App() {
 
     const lastPoint = savingsBalanceData[savingsBalanceData.length - 1];
     const endingBalance = lastPoint.y;
-
+    const withdrawalStartAmount =
+      savingsBalanceData.find(b => dayjs(b.x).format('YYYY-MM-DD') === parameters.withdrawalStart)
+        ?.y || 0;
     if (!parameters?.adjusted) {
-      if (endingBalance < 0) {
+      if (withdrawalStartAmount <= 0) {
+        setAlertTitle('Error!');
+        setAlertDescription(
+          'You need at least a starting balance or a monthly contribution amount.'
+        );
+        setAlertStatus('error');
+      } else if (endingBalance < 0) {
         setAlertTitle('Insufficient Funds!');
         setAlertDescription(
           'You will run out of savings before the end of the withdrawal period. Choose a correction below.'
@@ -181,6 +191,7 @@ function App() {
             )}
           </HStack>
         );
+      } else {
       }
     }
   }, [parameters?.adjusted, savingsBalanceData, shortfallAdjustmentType, shortfallAdjustmentValue]);
@@ -237,6 +248,19 @@ function App() {
     setShowWelcomeModal(false);
   }, []);
 
+  const [alertOpen, setAlertOpen] = useState(true);
+
+  const handleKeepReset = useCallback(
+    (isKeep: boolean) => {
+      if (isKeep) {
+        handleKeepAdjustment();
+      } else {
+        handleAdjustmentReset();
+      }
+    },
+    [handleKeepAdjustment, handleAdjustmentReset]
+  );
+
   return (
     <>
       <WelcomeModal
@@ -248,11 +272,15 @@ function App() {
       <InflationData open={showInflationData} onClose={() => setShowInflationData(false)} />
       <HStack
         w={'100%'}
+        backgroundColor={colorMode === 'light' ? 'white' : 'gray.800'}
         borderBottom={`1px solid`}
         borderBottomColor={colorMode === 'dark' ? 'gray.600' : 'gray.200'}
         justifyContent={'space-between'}
         height={'50px'}
         px={5}
+        position={'fixed'}
+        top={0}
+        zIndex={2}
       >
         <Heading size={'lg'} as={'h1'} fontWeight={400}>
           {appName}
@@ -275,7 +303,14 @@ function App() {
           />
         </HStack>
       </HStack>
-      <HStack alignItems={'stretch'} justifyItems={'stretch'} p={0} gap={5} height={'100%'}>
+      <HStack
+        alignItems={'stretch'}
+        justifyItems={'stretch'}
+        p={0}
+        gap={0}
+        mt={'50px'}
+        height={'100%'}
+      >
         <Box
           backgroundColor={colorMode === 'light' ? 'gray.50' : 'gray.700'}
           borderRight={`1px solid ${colorMode === 'light' ? '#eee' : '#555'}`}
@@ -289,47 +324,101 @@ function App() {
             shortfallAdjustmentType={shortfallAdjustmentType}
             shortfallAdjustmentValue={shortfallAdjustmentValue}
             preserveAdjustment={preserveAdjustment}
+            handleKeepReset={handleKeepReset}
             parameters={initialParameters}
           />
         </Box>
-        <VStack alignItems={'stretch'} flexGrow={1}>
-          <Alert status={alertStatus} variant="subtle" ml={'-5'} mr={'-5'} w={'auto'}>
-            <AlertIcon />
-            <AlertTitle whiteSpace={'nowrap'}>{alertTitle}</AlertTitle>
-            <AlertDescription w={'100%'} px={2}>
-              <HStack justifyContent={'space-between'}>
-                <Text maxW={'700px'}>{alertDescription}</Text>
-                {shortfallAdjustmentType && (
-                  <Box pr={5}>
-                    <Button
-                      size={'xs'}
-                      variant={'link'}
-                      color={colorMode === 'light' ? '#333' : 'inherit'}
-                      onClick={handleKeepAdjustment}
-                      mr={5}
-                    >
-                      Keep
-                    </Button>
-                    <Button
-                      size={'xs'}
-                      variant={'link'}
-                      color={'#b0413e'}
-                      onClick={handleAdjustmentReset}
-                    >
-                      Reset
-                    </Button>
-                  </Box>
-                )}
+        <VStack
+          alignItems={'stretch'}
+          flexGrow={1}
+          minW={0}
+          p={0}
+          position={'relative'}
+          w={'100%'}
+          overflowY={'auto'}
+        >
+          {alertOpen ? (
+            <Box>
+              <Alert status={alertStatus} variant="subtle" w={'auto'}>
+                <AlertIcon />
+                <AlertTitle whiteSpace={'nowrap'}>{alertTitle}</AlertTitle>
+                <AlertDescription w={'100%'} px={2}>
+                  <HStack justifyContent={'space-between'}>
+                    <Text maxW={'700px'}>{alertDescription}</Text>
+                    {shortfallAdjustmentType && (
+                      <Box pr={5}>
+                        <Button
+                          size={'xs'}
+                          variant={'link'}
+                          color={colorMode === 'light' ? '#333' : 'inherit'}
+                          onClick={handleKeepAdjustment}
+                          mr={5}
+                        >
+                          Keep
+                        </Button>
+                        <Button
+                          size={'xs'}
+                          variant={'link'}
+                          color={'#b0413e'}
+                          onClick={handleAdjustmentReset}
+                        >
+                          Reset
+                        </Button>
+                      </Box>
+                    )}
+                  </HStack>
+                </AlertDescription>
+                <CloseButton alignSelf="flex-end" onClick={() => setAlertOpen(false)} />
+              </Alert>
+            </Box>
+          ) : (
+            <Alert
+              status={alertStatus}
+              variant="transparent"
+              w={'auto'}
+              position={'absolute'}
+              zIndex={1}
+              top={'10px'}
+              mr={-1}
+              alignSelf="flex-end"
+            >
+              <AlertIcon onClick={() => setAlertOpen(true)} />
+            </Alert>
+          )}
+          <Box mt={0} p={2}>
+            <SavingsChart savingsBalanceData={savingsBalanceData} parameters={parameters} />
+            <Summary
+              savingsBalanceData={savingsBalanceData}
+              breakdownData={breakdownData}
+              parameters={parameters}
+              handleShortfallAdjustment={handleShortfallAdjustment}
+            />
+            <VStack mt={24} w={'100%'} alignContent={'center'} gap={10}>
+              <Text fontSize={'xs'} maxW={760} textAlign={'center'} color={'gray.500'}>
+                This tool is for illustrative purposes only. It is not intended to provide
+                investment advice or financial planning services. The results are based on the
+                information you provide and are not guaranteed. Actual results will definitely vary.
+                Please consult a qualified professional for personalized advice, or just buy some{' '}
+                <Link isExternal href={'https://www.swanbitcoin.com/motherway'}>
+                  ₿itcoin
+                </Link>
+                .
+              </Text>
+              <HStack maxW={760} justifyContent={'center'} alignItems={'flex-start'}>
+                <Link fontSize={'xs'} color={'gray.500'} isExternal href={'https://webxl.net'}>
+                  webXL
+                </Link>
+                <Link
+                  color={'gray.500'}
+                  isExternal
+                  href={'https://github.com/webxl/inflation-planner'}
+                >
+                  {' '}
+                  <Icon as={GitHub} />{' '}
+                </Link>
               </HStack>
-            </AlertDescription>
-          </Alert>
-          <SavingsChart savingsBalanceData={savingsBalanceData} parameters={parameters} />
-          <Summary
-            savingsBalanceData={savingsBalanceData}
-            breakdownData={breakdownData}
-            parameters={parameters}
-            handleShortfallAdjustment={handleShortfallAdjustment}
-          />
+            </VStack>
+          </Box>
         </VStack>
       </HStack>
     </>

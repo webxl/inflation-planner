@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import round from 'lodash/round';
 import { SavingsFormData } from '../savings.ts';
 import dayjs from 'dayjs';
+import { Box } from '@chakra-ui/react';
 
 export type SavingsBalanceData = {
   x: Date;
@@ -62,10 +63,10 @@ const SavingsChart = ({
     };
 
     /*
-             reduce dataset by taking each january 1st, the datapoint that's closest to the wd start date (1st of the same
-             month & year, and the point at which the balance is exhausted so that we can generate a continuous series composed
-             of the positive & negative points with their own colors
-            */
+     reduce dataset by taking each january 1st, the datapoint that's closest to the wd start date (1st of the same
+     month & year, and the point at which the balance is exhausted so that we can generate a continuous series composed
+     of the positive & negative points with their own colors
+    */
     savingsBalanceData
       .filter(
         dp =>
@@ -100,17 +101,17 @@ const SavingsChart = ({
       0
     );
     setYScaleMin(minY);
-    setYScaleMax(maxY);
+    setYScaleMax(Math.max(round(maxY, -5), maxY + 10000));
     setGridYValues([negativeSery.length ? minY : 0, Math.max(round(maxY, -5), maxY + 10000)]);
   }, [parameters, savingsBalanceData]);
 
   const withdrawalStart = dayjs(parameters.withdrawalStart).toDate();
   return chartData.length ? (
-    <div style={{ height: 350, touchAction: 'none' }}>
+    <Box height={350} style={{ touchAction: 'none' }} minW={0} width={'auto'}>
       <ResponsiveLine
         data={chartData}
         colors={['rgb(97, 205, 187)', 'rgb(244, 117, 96)']}
-        margin={{ top: 10, right: 10, bottom: 40, left: 70 }}
+        margin={{ top: 10, right: 10, bottom: 40, left: 40 }}
         theme={nivoThemes[colorMode]}
         crosshairType="x"
         enableArea
@@ -138,7 +139,6 @@ const SavingsChart = ({
         motionConfig={'wobbly'}
         axisBottom={{
           format: '%Y',
-          tickSize: 10,
           tickPadding: 5,
           tickRotation: -35,
           tickValues: 'every 5 years',
@@ -146,8 +146,7 @@ const SavingsChart = ({
           legendPosition: 'middle'
         }}
         axisLeft={{
-          format: '>-$,.2d',
-          tickSize: 8,
+          format: '>-$,.2s',
           tickPadding: 5,
           tickValues: 5,
           legendOffset: 0,
@@ -243,7 +242,7 @@ const SavingsChart = ({
           'mesh'
         ]}
       />
-    </div>
+    </Box>
   ) : null;
 };
 

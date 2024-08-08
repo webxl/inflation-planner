@@ -54,11 +54,13 @@ export const Summary = ({
   const [exdRestore, setExdRestore] = useState<Date | undefined>();
 
   useEffect(() => {
-    if (!parameters?.adjusted) {
-      const _exd = savingsBalanceData.slice(1).find(b => b.y <= 0)?.x;
-      setExdRestore(exd);
-      setExd(_exd);
-    }
+      const bal =
+        savingsBalanceData.find(b => dayjs(b.x).format('YYYY-MM') === withdrawalStartMonth)?.y || 0;
+      if (!parameters?.adjusted && bal > 0) {
+        const _exd = savingsBalanceData.slice(1).find(b => b.y <= 0)?.x;
+        setExdRestore(exd);
+        setExd(_exd);
+      }
   }, [exd, parameters?.adjusted, savingsBalanceData]);
 
   useEffect(() => {
@@ -105,19 +107,21 @@ export const Summary = ({
   };
 
   return (
-    <Box overflowY="auto" height="80vh" overflowX="scroll">
+    <Box /*overflowY="auto" height="80vh" overflowX="scroll"*/ width={'100%'}>
       <Table width={'100%'}>
         <Thead>
           <Tr>
-            <Th colSpan={2}>Projections</Th>
-            <Th colSpan={2} minW={{ lg: 460 }}></Th>
+            <Th colSpan={2} width={'50%'}>
+              Projections
+            </Th>
+            <Th colSpan={2} minW={{ xl: 460 }}></Th>
           </Tr>
         </Thead>
         <Tbody>
           <Tr>
             <Th>Withdrawal Start</Th>
             <Td>{balanceAtWithdrawalStart}</Td>
-            <Th w={165}>Contributions</Th>
+            <Th>Contributions</Th>
             <Td>{totalContributions}</Td>
           </Tr>
           <Tr>
@@ -173,24 +177,8 @@ export const Summary = ({
             </Tr>
           )}
         </Tbody>
-        <Thead>
-          <Tr>
-            <Th colSpan={2} pt={6} borderBottom={0}>
-              Total Savings
-            </Th>
-            <Th colSpan={2} pt={6} minW={{ lg: 460 }} borderBottom={0}>
-              Total Consumption
-            </Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr borderTop={0}>
-            <Td colSpan={4}>
-              <BreakdownChart breakdownData={breakdownData} />
-            </Td>
-          </Tr>
-        </Tbody>
       </Table>
+      <BreakdownChart breakdownData={breakdownData} />
       {/* </Flex>*/}
     </Box>
   );

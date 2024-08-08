@@ -16,6 +16,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@chakra-ui/styled-system": "^2.9.2",
     "@chakra-ui/system": "^2.6.2",
+    "@chakra-ui/theme": "^3.3.1",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@fontsource-variable/nunito": "^5.0.19",
@@ -34,7 +35,6 @@
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
     "react-is": "^18.3.1",
-    "recharts": "^2.12.7",
     "styled-components": "^6.1.12"
   },
   "devDependencies": {
@@ -48,8 +48,10 @@
     "@vitejs/plugin-react": "^4.3.1",
     "@vitejs/plugin-react-swc": "^3.7.0",
     "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "eslint-plugin-unused-imports": "^4.0.1",
     "prettier": "^3.3.3",
     "typescript": "^5.2.2",
     "vite": "^5.3.4"
