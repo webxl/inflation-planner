@@ -43,8 +43,8 @@ import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 import { useColorMode } from '@chakra-ui/system';
 import { Summary } from './sections/Summary.tsx';
 import { formatCurrencyWithCents, formatPercentage } from './utils.ts';
-import { WelcomeModal } from './WelcomeModal.tsx';
-import { InflationData } from './InflationData.tsx';
+import { WelcomeModal } from './sections/WelcomeModal.tsx';
+import { InflationData } from './sections/InflationData.tsx';
 import { AlertTriangle, GitHub, Sliders } from 'react-feather';
 import { Header } from './sections/Header.tsx';
 
@@ -73,18 +73,18 @@ function App() {
     ShortfallAdjustmentType | undefined
   >();
   const [shortfallAdjustmentValue, setShortfallAdjustmentValue] = useState<string | number>('');
-    const breakpointValue = useBreakpointValue({
-      base: 'base',
-      md: 'md'
-    });
+  const breakpointValue = useBreakpointValue({
+    base: 'base',
+    md: 'md'
+  });
 
-    const handleParameterUpdate = useCallback((formData: SavingsFormData) => {
-      setParameters({ ...formData });
-      setInitialParameters({ ...formData });
-      const { savingsBalanceData, breakdownData } = calculateSavingsBalance(formData);
-      setSavingsBalanceData(savingsBalanceData);
-      setBreakdownData(breakdownData);
-    }, []);
+  const handleParameterUpdate = useCallback((formData: SavingsFormData) => {
+    setParameters({ ...formData });
+    setInitialParameters({ ...formData });
+    const { savingsBalanceData, breakdownData } = calculateSavingsBalance(formData);
+    setSavingsBalanceData(savingsBalanceData);
+    setBreakdownData(breakdownData);
+  }, []);
 
   useEffect(() => {
     handleParameterUpdate(initialState);
@@ -113,8 +113,8 @@ function App() {
     [parameters, handleParameterUpdate, initialParameters]
   );
 
-    const { colorMode } = useColorMode();
-    const [alertTitle, setAlertTitle] = useState('Congratulations!');
+  const { colorMode } = useColorMode();
+  const [alertTitle, setAlertTitle] = useState('Congratulations!');
   const [alertDescription, setAlertDescription] = useState<ReactNode>(
     'You have saved enough to retire!'
   );
@@ -277,167 +277,166 @@ function App() {
     [handleKeepAdjustment, handleAdjustmentReset]
   );
 
-    const {
-      isOpen: isDrawerOpen,
-      onOpen: setDrawerOpen,
-      onClose: setDrawerClosed
-    } = useDisclosure({ defaultIsOpen: breakpointValue === 'base' });
+  const {
+    isOpen: isDrawerOpen,
+    onOpen: setDrawerOpen,
+    onClose: setDrawerClosed
+  } = useDisclosure({ defaultIsOpen: breakpointValue === 'base' });
 
-    const parametersSection = (
-      <Parameters
-        onChange={handleParameterUpdate}
-        shortfallAdjustmentType={shortfallAdjustmentType}
-        shortfallAdjustmentValue={shortfallAdjustmentValue}
-        preserveAdjustment={preserveAdjustment}
-        handleKeepReset={handleKeepReset}
-        parameters={initialParameters}
-        onDrawerClose={breakpointValue === 'base' ? setDrawerClosed : undefined}
+  const parametersSection = (
+    <Parameters
+      onChange={handleParameterUpdate}
+      shortfallAdjustmentType={shortfallAdjustmentType}
+      shortfallAdjustmentValue={shortfallAdjustmentValue}
+      preserveAdjustment={preserveAdjustment}
+      handleKeepReset={handleKeepReset}
+      parameters={initialParameters}
+      onDrawerClose={breakpointValue === 'base' ? setDrawerClosed : undefined}
+    />
+  );
+  return (
+    <>
+      <InflationData open={showInflationData} onClose={() => setShowInflationData(false)} />
+      <Header
+        onClickStats={() => setShowInflationData(true)}
+        onClickHelp={() => setShowWelcomeModal(true)}
       />
-    );
-    return (
-      <>
-        <InflationData open={showInflationData} onClose={() => setShowInflationData(false)} />
-        <Header
-          onClickStats={() => setShowInflationData(true)}
-          onClickHelp={() => setShowWelcomeModal(true)}
-        />
-        {breakpointValue === 'base' && (
-          <HStack justifyContent={'space-between'} w={'100%'} mt={'55px'}>
-            <Button onClick={setDrawerOpen} variant={'ghost'} alignSelf={'center'}>
-              <Icon as={Sliders} mr={1} /> Parameters
-            </Button>
-            <Drawer isOpen={isDrawerOpen} onClose={setDrawerClosed} placement="left">
-              <DrawerOverlay />
-              <DrawerContent>
-                <DrawerCloseButton />
-                <DrawerHeader>Adjustments</DrawerHeader>
-                <DrawerBody>{parametersSection}</DrawerBody>
-              </DrawerContent>
-            </Drawer>
-          </HStack>
-        )}
-        <WelcomeModal
-          open={showWelcomeModal}
-          onClose={handleClose}
-          value={initialAge}
-          onChange={setInitialAge}
-        />
-        <HStack
-          alignItems={'stretch'}
-          justifyItems={'stretch'}
-          p={0}
-          gap={0}
-          mt={breakpointValue !== 'base' ? '50px' : 0}
-          height={'100%'}
-        >
-          {breakpointValue !== 'base' && (
-            <Box
-              backgroundColor={colorMode === 'light' ? 'gray.50' : 'gray.700'}
-              borderRight={`1px solid ${colorMode === 'light' ? '#eee' : '#555'}`}
-              w={'300px'}
-              minHeight={'calc(100vh - 50px)'}
-              px={5}
-              pt={2}
-            >
-              {parametersSection}
-            </Box>
-          )}
-          <VStack
-            alignItems={'stretch'}
-            flexGrow={1}
-            minW={0}
-            p={0}
-            position={'relative'}
-            w={'100%'}
-            overflowY={'auto'}
-          >
-            {alertOpen ? (
-              <Box>
-                <Alert status={alertStatus} variant="subtle" w={'auto'}>
-                  <AlertIcon />
-                  <AlertTitle whiteSpace={'nowrap'}>{alertTitle}</AlertTitle>
-                  <AlertDescription w={'100%'} px={2}>
-                    <HStack justifyContent={'space-between'}>
-                      <Text maxW={'700px'}>{alertDescription}</Text>
-                      {shortfallAdjustmentType && (
-                        <Box pr={5}>
-                          <Button
-                            size={'xs'}
-                            variant={'link'}
-                            color={colorMode === 'light' ? '#333' : 'inherit'}
-                            onClick={handleKeepAdjustment}
-                            mr={5}
-                          >
-                            Keep
-                          </Button>
-                          <Button
-                            size={'xs'}
-                            variant={'link'}
-                            color={'#b0413e'}
-                            onClick={handleAdjustmentReset}
-                          >
-                            Reset
-                          </Button>
-                        </Box>
-                      )}
-                    </HStack>
-                  </AlertDescription>
-                  <CloseButton alignSelf="flex-end" onClick={() => setAlertOpen(false)} />
-                </Alert>
-              </Box>
-            ) : (
-              <Alert
-                status={alertStatus}
-                variant="transparent"
-                w={'auto'}
-                position={'absolute'}
-                zIndex={1}
-                top={'10px'}
-                mr={-1}
-                alignSelf="flex-end"
-              >
-                <AlertIcon onClick={() => setAlertOpen(true)} />
-              </Alert>
-            )}
-            <Box mt={0} px={2}>
-              <SavingsChart savingsBalanceData={savingsBalanceData} parameters={parameters} />
-              <Summary
-                savingsBalanceData={savingsBalanceData}
-                breakdownData={breakdownData}
-                parameters={parameters}
-                handleShortfallAdjustment={handleShortfallAdjustment}
-              />
-              <VStack mt={24} w={'100%'} alignContent={'center'} gap={10}>
-                <Text fontSize={'xs'} maxW={760} textAlign={'center'} color={'gray.500'}>
-                  This tool is for illustrative purposes only. It is not intended to provide
-                  investment advice or financial planning services. The results are based on the
-                  information you provide and are not guaranteed. Actual results will definitely
-                  vary. Please consult a qualified professional for personalized advice, or just buy
-                  some{' '}
-                  <Link isExternal href={'https://www.swanbitcoin.com/motherway'}>
-                    ₿itcoin
-                  </Link>
-                  .
-                </Text>
-                <HStack maxW={760} justifyContent={'center'} alignItems={'flex-start'}>
-                  <Link fontSize={'xs'} color={'gray.500'} isExternal href={'https://webxl.net'}>
-                    webXL
-                  </Link>
-                  <Link
-                    color={'gray.500'}
-                    isExternal
-                    href={'https://github.com/webxl/inflation-planner'}
-                  >
-                    {' '}
-                    <Icon as={GitHub} />{' '}
-                  </Link>
-                </HStack>
-              </VStack>
-            </Box>
-          </VStack>
+      {breakpointValue === 'base' && (
+        <HStack justifyContent={'space-between'} w={'100%'} mt={'55px'}>
+          <Button onClick={setDrawerOpen} variant={'ghost'} alignSelf={'center'}>
+            <Icon as={Sliders} mr={1} /> Parameters
+          </Button>
+          <Drawer isOpen={isDrawerOpen} onClose={setDrawerClosed} placement="left">
+            <DrawerOverlay />
+            <DrawerContent>
+              <DrawerCloseButton />
+              <DrawerHeader>Adjustments</DrawerHeader>
+              <DrawerBody>{parametersSection}</DrawerBody>
+            </DrawerContent>
+          </Drawer>
         </HStack>
-      </>
-    );
+      )}
+      <WelcomeModal
+        open={showWelcomeModal}
+        onClose={handleClose}
+        value={initialAge}
+        onChange={setInitialAge}
+      />
+      <HStack
+        alignItems={'stretch'}
+        justifyItems={'stretch'}
+        p={0}
+        gap={0}
+        mt={breakpointValue !== 'base' ? '50px' : 0}
+        height={'100%'}
+      >
+        {breakpointValue !== 'base' && (
+          <Box
+            backgroundColor={colorMode === 'light' ? 'gray.50' : 'gray.700'}
+            borderRight={`1px solid ${colorMode === 'light' ? '#eee' : '#555'}`}
+            w={'300px'}
+            minHeight={'calc(100vh - 50px)'}
+            px={5}
+            pt={2}
+          >
+            {parametersSection}
+          </Box>
+        )}
+        <VStack
+          alignItems={'stretch'}
+          flexGrow={1}
+          minW={0}
+          p={0}
+          position={'relative'}
+          w={'100%'}
+          overflowY={'auto'}
+        >
+          {alertOpen ? (
+            <Box>
+              <Alert status={alertStatus} variant="subtle" w={'auto'}>
+                <AlertIcon />
+                <AlertTitle whiteSpace={'nowrap'}>{alertTitle}</AlertTitle>
+                <AlertDescription w={'100%'} px={2}>
+                  <HStack justifyContent={'space-between'}>
+                    <Text maxW={'700px'}>{alertDescription}</Text>
+                    {shortfallAdjustmentType && (
+                      <Box pr={5}>
+                        <Button
+                          size={'xs'}
+                          variant={'link'}
+                          color={colorMode === 'light' ? '#333' : 'inherit'}
+                          onClick={handleKeepAdjustment}
+                          mr={5}
+                        >
+                          Keep
+                        </Button>
+                        <Button
+                          size={'xs'}
+                          variant={'link'}
+                          color={'#b0413e'}
+                          onClick={handleAdjustmentReset}
+                        >
+                          Reset
+                        </Button>
+                      </Box>
+                    )}
+                  </HStack>
+                </AlertDescription>
+                <CloseButton alignSelf="flex-end" onClick={() => setAlertOpen(false)} />
+              </Alert>
+            </Box>
+          ) : (
+            <Alert
+              status={alertStatus}
+              variant="transparent"
+              w={'auto'}
+              position={'absolute'}
+              zIndex={1}
+              top={'10px'}
+              mr={-1}
+              alignSelf="flex-end"
+            >
+              <AlertIcon onClick={() => setAlertOpen(true)} />
+            </Alert>
+          )}
+          <Box mt={0} px={2}>
+            <SavingsChart savingsBalanceData={savingsBalanceData} parameters={parameters} />
+            <Summary
+              savingsBalanceData={savingsBalanceData}
+              breakdownData={breakdownData}
+              parameters={parameters}
+              handleShortfallAdjustment={handleShortfallAdjustment}
+            />
+            <VStack mt={24} w={'100%'} alignContent={'center'} gap={10}>
+              <Text fontSize={'xs'} maxW={760} textAlign={'center'} color={'gray.500'}>
+                This tool is for illustrative purposes only. It is not intended to provide
+                investment advice or financial planning services. The results are based on the
+                information you provide and are not guaranteed. Actual results will definitely vary.
+                Please consult a qualified professional for personalized advice, or just buy some{' '}
+                <Link isExternal href={'https://www.swanbitcoin.com/motherway'}>
+                  ₿itcoin
+                </Link>
+                .
+              </Text>
+              <HStack maxW={760} justifyContent={'center'} alignItems={'flex-start'}>
+                <Link fontSize={'xs'} color={'gray.500'} isExternal href={'https://webxl.net'}>
+                  webXL
+                </Link>
+                <Link
+                  color={'gray.500'}
+                  isExternal
+                  href={'https://github.com/webxl/inflation-planner'}
+                >
+                  {' '}
+                  <Icon as={GitHub} />{' '}
+                </Link>
+              </HStack>
+            </VStack>
+          </Box>
+        </VStack>
+      </HStack>
+    </>
+  );
 }
 
 export default App;

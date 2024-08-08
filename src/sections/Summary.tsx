@@ -107,132 +107,132 @@ export const Summary = ({
     initialSavingsAmount: 'Increase Initial Savings'
   };
 
-    const breakpoint = useBreakpointValue({
-      base: 'base',
-      md: 'md'
-    });
+  const breakpoint = useBreakpointValue({
+    base: 'base',
+    md: 'md'
+  });
 
-    const WithdrawalStart = (
-      <>
-        <Th>Withdrawal Start</Th>
-        <Td>{balanceAtWithdrawalStart}</Td>
-      </>
-    );
-    const Contributions = (
-      <>
-        <Th>Contributions</Th>
-        <Td>{totalContributions}</Td>
-      </>
-    );
-    const WithdrawalEnd = (
-      <>
-        <Th>Withdrawal End</Th>
-        <Td>{formatCurrency(savingsBalanceData[savingsBalanceData.length - 1]?.y)}</Td>
-      </>
-    );
-    const TotalInflation = (
-      <>
-        <Th>Inflation</Th>
-        <Td>
-          {totalInflation !== '$0' ? '-' : ''}
-          {totalInflation}
-        </Td>
-      </>
-    );
-    const BalanceExhausted = (
-      <>
-        <Th color={shortfallAdjustmentType ? '#888' : 'inherit'}>Balance exhausted</Th>
-        <Td color={shortfallAdjustmentType ? '#888' : '#b0413e'}>{exhaustedDate}</Td>
-      </>
-    );
-    const Correction = (
-      <>
-        <Th>Correction</Th>
-        <Td py={0}>
-          {' '}
-          {shortfallAdjustmentType ? (
+  const WithdrawalStart = (
+    <>
+      <Th>Withdrawal Start</Th>
+      <Td>{balanceAtWithdrawalStart}</Td>
+    </>
+  );
+  const Contributions = (
+    <>
+      <Th>Contributions</Th>
+      <Td>{totalContributions}</Td>
+    </>
+  );
+  const WithdrawalEnd = (
+    <>
+      <Th>Withdrawal End</Th>
+      <Td>{formatCurrency(savingsBalanceData[savingsBalanceData.length - 1]?.y)}</Td>
+    </>
+  );
+  const TotalInflation = (
+    <>
+      <Th>Inflation</Th>
+      <Td>
+        {totalInflation !== '$0' ? '-' : ''}
+        {totalInflation}
+      </Td>
+    </>
+  );
+  const BalanceExhausted = (
+    <>
+      <Th color={shortfallAdjustmentType ? '#888' : 'inherit'}>Balance exhausted</Th>
+      <Td color={shortfallAdjustmentType ? '#888' : '#b0413e'}>{exhaustedDate}</Td>
+    </>
+  );
+  const Correction = (
+    <>
+      <Th>Correction</Th>
+      <Td py={0}>
+        {' '}
+        {shortfallAdjustmentType ? (
+          <>
+            <HStack whiteSpace={'nowrap'}>
+              <Text>{menuItems[shortfallAdjustmentType]}</Text>
+              <IconButton
+                icon={<Icon as={XCircle} />}
+                onClick={() => {
+                  setIsResetting(true);
+                  setShortfallAdjustment(undefined);
+                }}
+                aria-label="Clear correction"
+                variant="ghost"
+                height={0}
+              />
+            </HStack>
+          </>
+        ) : (
+          <Menu>
+            <MenuButton as={Button} size={'sm'} rightIcon={<ChevronDownIcon />}>
+              {'Select Adjustment'}
+            </MenuButton>
+            <MenuList>
+              {Object.entries(menuItems).map(([type, label]) => (
+                <MenuItem
+                  key={type}
+                  onClick={() => setShortfallAdjustment(type as ShortfallAdjustmentType)}
+                >
+                  {label}
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        )}
+      </Td>
+    </>
+  );
+  return (
+    <Box width={'100%'}>
+      <Table width={'100%'}>
+        <Thead>
+          <Tr>
+            <Th colSpan={2} width={{ md: '50%' }}>
+              Projections
+            </Th>
+            {breakpoint === 'md' && <Th colSpan={2} minW={{ xl: 460 }}></Th>}
+          </Tr>
+        </Thead>
+        <Tbody>
+          {breakpoint === 'base' ? (
             <>
-              <HStack whiteSpace={'nowrap'}>
-                <Text>{menuItems[shortfallAdjustmentType]}</Text>
-                <IconButton
-                  icon={<Icon as={XCircle} />}
-                  onClick={() => {
-                    setIsResetting(true);
-                    setShortfallAdjustment(undefined);
-                  }}
-                  aria-label="Clear correction"
-                  variant="ghost"
-                  height={0}
-                />
-              </HStack>
+              <Tr>{WithdrawalStart}</Tr>
+              <Tr>{WithdrawalEnd}</Tr>
+              <Tr>{Contributions}</Tr>
+              <Tr>{TotalInflation}</Tr>
+              {(exd || exhaustedDate || shortfallAdjustmentType) && (
+                <>
+                  <Tr>{BalanceExhausted}</Tr>
+                  <Tr>{Correction}</Tr>
+                </>
+              )}
             </>
           ) : (
-            <Menu>
-              <MenuButton as={Button} size={'sm'} rightIcon={<ChevronDownIcon />}>
-                {'Select Adjustment'}
-              </MenuButton>
-              <MenuList>
-                {Object.entries(menuItems).map(([type, label]) => (
-                  <MenuItem
-                    key={type}
-                    onClick={() => setShortfallAdjustment(type as ShortfallAdjustmentType)}
-                  >
-                    {label}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-          )}
-        </Td>
-      </>
-    );
-    return (
-      <Box width={'100%'}>
-        <Table width={'100%'}>
-          <Thead>
-            <Tr>
-              <Th colSpan={2} width={{ md: '50%' }}>
-                Projections
-              </Th>
-              {breakpoint === 'md' && <Th colSpan={2} minW={{ xl: 460 }}></Th>}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {breakpoint === 'base' ? (
-              <>
-                <Tr>{WithdrawalStart}</Tr>
-                <Tr>{WithdrawalEnd}</Tr>
-                <Tr>{Contributions}</Tr>
-                <Tr>{TotalInflation}</Tr>
-                {(exd || exhaustedDate || shortfallAdjustmentType) && (
-                  <>
-                    <Tr>{BalanceExhausted}</Tr>
-                    <Tr>{Correction}</Tr>
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Tr>
-                  {WithdrawalStart}
-                  {Contributions}
-                </Tr>
-                <Tr>
-                  {WithdrawalEnd}
-                  {TotalInflation}
-                </Tr>
+            <>
+              <Tr>
+                {WithdrawalStart}
+                {Contributions}
+              </Tr>
+              <Tr>
+                {WithdrawalEnd}
+                {TotalInflation}
+              </Tr>
 
-                {(exd || exhaustedDate || shortfallAdjustmentType) && (
-                  <Tr>
-                    {BalanceExhausted}
-                    {Correction}
-                  </Tr>
-                )}
-              </>
-            )}
-          </Tbody>
-        </Table>
-        <BreakdownChart breakdownData={breakdownData} />
-      </Box>
-    );
+              {(exd || exhaustedDate || shortfallAdjustmentType) && (
+                <Tr>
+                  {BalanceExhausted}
+                  {Correction}
+                </Tr>
+              )}
+            </>
+          )}
+        </Tbody>
+      </Table>
+      <BreakdownChart breakdownData={breakdownData} />
+    </Box>
+  );
 };

@@ -10,10 +10,10 @@ import {
   ModalOverlay,
   Select
 } from '@chakra-ui/react';
-import CountryData, { yearMax, yearMin } from './charts/CountryData.tsx';
+import CountryData, { yearMax, yearMin } from '../charts/CountryData.tsx';
 import React, { useCallback } from 'react';
 
-import rawInflationData from './inflation.json';
+import rawInflationData from '../inflation.json';
 
 // data from https://data-explorer.oecd.org/vis?lc=en&df[ds]=DisseminateArchiveDMZ&df[id]=DF_DP_LIVE&df[ag]=OECD&df[vs]=&av=true&pd=2009%2C2023&dq=CRI%2BCOL%2BCHL%2BHUN%2BGRC%2BDEU%2BFRA%2BFIN%2BEST%2BCZE%2BDNK%2BITA%2BISR%2BISL%2BIRL%2BJPN%2BKOR%2BLVA%2BLTU%2BLUX%2BMEX%2BNLD%2BNZL%2BNOR%2BPOL%2BPRT%2BSVK%2BSVN%2BESP%2BSWE%2BCHE%2BTUR%2BGBR%2BUSA%2BCAN%2BBEL%2BAUT%2BAUS%2BOAVG.CPI..AGRWTH.A&to[TIME_PERIOD]=false&vw=tb
 // -> excel ->

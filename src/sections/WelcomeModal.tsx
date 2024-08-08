@@ -17,7 +17,7 @@ import {
   Text,
   VStack
 } from '@chakra-ui/react';
-import { appName } from './const.ts';
+import { appName } from '../const.ts';
 
 export const WelcomeModal = ({
   open,
