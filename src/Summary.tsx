@@ -54,14 +54,14 @@ export const Summary = ({
   const [exdRestore, setExdRestore] = useState<Date | undefined>();
 
   useEffect(() => {
-      const bal =
-        savingsBalanceData.find(b => dayjs(b.x).format('YYYY-MM') === withdrawalStartMonth)?.y || 0;
-      if (!parameters?.adjusted && bal > 0) {
-        const _exd = savingsBalanceData.slice(1).find(b => b.y <= 0)?.x;
-        setExdRestore(exd);
-        setExd(_exd);
-      }
-  }, [exd, parameters?.adjusted, savingsBalanceData]);
+    const bal =
+      savingsBalanceData.find(b => dayjs(b.x).format('YYYY-MM') === withdrawalStartMonth)?.y || 0;
+    if (!parameters?.adjusted && bal > 0) {
+      const _exd = savingsBalanceData.slice(1).find(b => b.y <= 0)?.x;
+      setExdRestore(exd);
+      setExd(_exd);
+    }
+  }, [exd, parameters?.adjusted, savingsBalanceData, withdrawalStartMonth]);
 
   useEffect(() => {
     setExhaustedDate(exd ? dayjs(exd).format('L') : undefined);
