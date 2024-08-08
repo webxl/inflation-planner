@@ -41,7 +41,7 @@ export const WelcomeModal = ({
   );
 
   return (
-    <Modal isOpen={open} onClose={onClose} size={'2xl'}>
+    <Modal isOpen={open} onClose={onClose} size={{ lg: '2xl', base: 'full' }}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Welcome to {appName}</ModalHeader>

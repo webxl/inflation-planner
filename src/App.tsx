@@ -238,10 +238,10 @@ function App() {
     const adjustedWithdrawalStartDate = dayjs(initialParameters.contributionStart)
       .startOf('day')
       .toDate();
-      const year = Math.max(
-        dayjs().get('year'),
-        adjustedWithdrawalStartDate.getFullYear() + 67 - initialAge
-      );
+    const year = Math.max(
+      dayjs().get('year'),
+      adjustedWithdrawalStartDate.getFullYear() + 67 - initialAge
+    );
 
     adjustedWithdrawalStartDate.setFullYear(year);
     const adjustedWithdrawalStart = dayjs(adjustedWithdrawalStartDate).format('YYYY-MM-DD');
