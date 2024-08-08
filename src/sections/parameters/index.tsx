@@ -291,7 +291,7 @@ const Parameters = ({
           Apply
         </Button>
       )}
-      <Button variant={'link'} onClick={_resetToDefaults} alignSelf={'center'}>
+      <Button mt={5} variant={'link'} onClick={_resetToDefaults} alignSelf={'center'}>
         Reset to defaults
       </Button>
     </VStack>

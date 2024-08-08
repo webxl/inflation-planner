@@ -111,7 +111,7 @@ const SavingsChart = ({
       <ResponsiveLine
         data={chartData}
         colors={['rgb(97, 205, 187)', 'rgb(244, 117, 96)']}
-        margin={{ top: 10, right: 10, bottom: 40, left: 40 }}
+        margin={{ top: 10, right: 1, bottom: 40, left: 40 }}
         theme={nivoThemes[colorMode]}
         crosshairType="x"
         enableArea

@@ -75,10 +75,13 @@ export const calculateSavingsBalance = (
   const currentDate = dayjs(contributionStart).toDate();
   const withdrawalStartDate = dayjs(withdrawalStart).toDate();
   const withdrawalEndDate = dayjs(withdrawalEnd).toDate();
-  const rateMultiplier = 1 + (expectedRateOfReturn - projectedInflationRate) / 12;
+  const daysInYear = 365.24;
+  const rateMultiplier = 1 + (expectedRateOfReturn - projectedInflationRate) / daysInYear;
+
+  let dailyReturn = 0,
+    dailyInflation = 0;
 
   while (currentDate < withdrawalStartDate) {
-    savingsBalanceData.push({ x: new Date(currentDate), y: currentSavings });
     const adjustedMonthlyContributionAmount =
       (monthlyContributionAmount *
         (increaseContributionWithInflation
@@ -87,18 +90,22 @@ export const calculateSavingsBalance = (
               currentDate.getFullYear() - contributionStartDate.getFullYear()
             )
           : 1)) /
-      (365.24 / 12);
+      (daysInYear / 12);
     currentSavings += adjustedMonthlyContributionAmount;
     cumulativeContribution += adjustedMonthlyContributionAmount;
-    if (currentDate.getDate() === 1) {
-      currentSavings *= rateMultiplier;
-      cumulativeReturn += (currentSavings * expectedRateOfReturn) / 12;
-      cumulativeInflation += (currentSavings * projectedInflationRate) / 12;
-    }
+
+    dailyReturn = (currentSavings * expectedRateOfReturn) / daysInYear;
+    dailyInflation = (currentSavings * projectedInflationRate) / daysInYear;
+
+    cumulativeReturn += dailyReturn;
+    cumulativeInflation += dailyInflation;
+    currentSavings *= rateMultiplier;
+
+    savingsBalanceData.push({ x: new Date(currentDate), y: currentSavings });
+
     currentDate.setDate(currentDate.getDate() + 1);
   }
   while (currentDate < withdrawalEndDate) {
-    savingsBalanceData.push({ x: new Date(currentDate), y: currentSavings });
     // adjust withdrawal amount for inflation
     const adjustedWithdrawalAmount =
       withdrawalMonthlyAmount *
@@ -108,14 +115,20 @@ export const calculateSavingsBalance = (
             currentDate.getFullYear() - withdrawalStartDate.getFullYear() // todo: should this be the contribution start?
           )
         : 1);
-    currentSavings -= (12 * adjustedWithdrawalAmount) / 365.24;
-    cumulativeWithdrawal += (12 * adjustedWithdrawalAmount) / 365.24;
-    if (currentDate.getDate() === 1) {
-      currentSavings *= rateMultiplier;
-      cumulativeReturn += currentSavings > 0 ? (currentSavings * expectedRateOfReturn) / 12 : 0;
-      cumulativeInflation +=
-        currentSavings > 0 ? (currentSavings * projectedInflationRate) / 12 : 0;
-    }
+
+    currentSavings -= (12 * adjustedWithdrawalAmount) / daysInYear;
+    cumulativeWithdrawal += (12 * adjustedWithdrawalAmount) / daysInYear;
+
+    dailyReturn = currentSavings > 0 ? (currentSavings * expectedRateOfReturn) / daysInYear : 0;
+    dailyInflation =
+      currentSavings > 0 ? (currentSavings * projectedInflationRate) / daysInYear : 0;
+    cumulativeReturn += dailyReturn;
+
+    cumulativeInflation += dailyInflation;
+    currentSavings *= rateMultiplier;
+
+    savingsBalanceData.push({ x: new Date(currentDate), y: currentSavings });
+
     currentDate.setDate(currentDate.getDate() + 1);
   }
   breakdownData.push({ id: breakdownType.contributions, value: cumulativeContribution });

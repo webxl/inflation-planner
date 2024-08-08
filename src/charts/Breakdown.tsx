@@ -4,7 +4,7 @@ import { formatCurrency } from '../utils.ts';
 import { BasicTooltip } from '@nivo/tooltip';
 import { nivoThemes } from '../theme.ts';
 import { useColorMode } from '@chakra-ui/system';
-import { Box, HStack, Table, Th, Thead, VStack } from '@chakra-ui/react';
+import { Box, HStack, Table, Text, Th, Thead, VStack } from '@chakra-ui/react';
 
 const serieDefs: {
   [id in breakdownType]: {
@@ -122,6 +122,8 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
       };
     });
 
+  const totalGains = gains.reduce((acc, d) => acc + d.value, 0);
+  const totalLosses = losses.reduce((acc, d) => acc + d.value, 0);
   return (
     <HStack flexWrap={'wrap'} w={'100%'} gap={0} justifyContent={'space-between'}>
       <VStack w={{ base: '100%', lg: '50%' }} minW={400} p={0}>
@@ -133,6 +135,9 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
           </Thead>
         </Table>
         <BreakdownPieChart data={gains} />
+        <Text fontSize={'sm'} textAlign={'center'} color={'gray.500'}>
+          {formatCurrency(totalGains)}
+        </Text>
       </VStack>
       <VStack w={{ base: '100%', lg: '50%' }} p={0} minW={{ xl: 460 }} minH={200}>
         <Table width={'100%'} as={'div'}>
@@ -141,6 +146,9 @@ const BreakdownChart = ({ breakdownData }: { breakdownData: BreakdownData[] }) =
           </Th>
         </Table>
         <BreakdownPieChart data={losses} />
+        <Text fontSize={'sm'} textAlign={'center'} color={'gray.500'}>
+          {formatCurrency(totalLosses)}
+        </Text>
       </VStack>
     </HStack>
   );
