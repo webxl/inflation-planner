@@ -1,7 +1,10 @@
 # Inflation Planner
 
+[Inflation Planner](https://inflation-planner.vercel.app/)
+
 Inflation Planner is a simple web application that helps you plan for inflation. It allows you to calculate the future
-value of an investment based on the current value, interest rate, and number of years.
+value of your savings based on the current value, interest rate, rate or return, contributions, withdrawals and
+retirement time frame.
 
 Developed using React, TypeScript, [Chakra UI](https://v2.chakra-ui.com/), [Nivo](https://nivo.rocks/) & Vite.
 
@@ -24,4 +27,4 @@ TODO:
 - add more inflation statistics
 - add parameters to URL for sharing
 - ~~make parameters sticky using local storage~~
-- add monte carlo simulation
+- add monte carlo simulations
