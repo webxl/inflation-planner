@@ -134,7 +134,13 @@ function App() {
     return !savedState;
   });
   const [showInflationData, setShowInflationData] = useState(false);
-  const [initialAge, setInitialAge] = useState(37);
+    const [initialAge, setInitialAge] = useState(() => {
+      const lsAge = localStorage.getItem('age');
+      if (lsAge) {
+        return parseInt(lsAge, 10);
+      }
+      return 37;
+    });
 
   useEffect(() => {
     if (!savingsBalanceData.length) return;
@@ -249,9 +255,7 @@ function App() {
 
   useEffect(() => {
     if (!showWelcomeModal) return;
-    const adjustedWithdrawalStartDate = dayjs(initialParameters.contributionStart)
-      .startOf('day')
-      .toDate();
+    const adjustedWithdrawalStartDate = dayjs(parameters.contributionStart).startOf('day').toDate();
     const year = Math.max(
       dayjs().get('year'),
       adjustedWithdrawalStartDate.getFullYear() + 67 - initialAge
@@ -260,26 +264,19 @@ function App() {
     adjustedWithdrawalStartDate.setFullYear(year);
     const adjustedWithdrawalStart = dayjs(adjustedWithdrawalStartDate).format('YYYY-MM-DD');
 
-    if (adjustedWithdrawalStart !== initialParameters.withdrawalStart) {
+    if (adjustedWithdrawalStart !== parameters.withdrawalStart) {
       handleParameterUpdate({
-        ...initialParameters,
         ...parameters,
         withdrawalStart: adjustedWithdrawalStart,
         withdrawalEnd: dayjs(adjustedWithdrawalStartDate).add(25, 'year').format('YYYY-MM-DD')
       });
     }
-  }, [
-    parameters,
-    initialAge,
-    initialParameters,
-    handleParameterUpdate,
-    showInflationData,
-    showWelcomeModal
-  ]);
+  }, [parameters, initialAge, handleParameterUpdate, showWelcomeModal]);
 
   const handleClose = useCallback(() => {
+    localStorage.setItem('age', initialAge.toString());
     setShowWelcomeModal(false);
-  }, []);
+  }, [initialAge]);
 
   const handleKeepReset = useCallback(
     (isKeep: boolean) => {
